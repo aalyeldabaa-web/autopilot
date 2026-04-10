@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autopilot - Social Media Command Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #0a0e27;
+  color: #e4e6eb;
+  min-height: 100vh;
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(100, 200, 255, 0.15);
+}
+
+.logo {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #64c8ff 0%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+}
+
+.logo-sub {
+  font-size: 13px;
+  color: #8b92b0;
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 4px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: 1px solid rgba(100, 200, 255, 0.3);
+  background: rgba(100, 200, 255, 0.05);
+  color: #64c8ff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.btn:hover {
+  background: rgba(100, 200, 255, 0.15);
+  border-color: rgba(100, 200, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #64c8ff 0%, #a78bfa 100%);
+  border: none;
+  color: #0a0e27;
+  font-weight: 700;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(100, 200, 255, 0.4);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: rgba(20, 27, 61, 0.6);
+  border: 1px solid rgba(100, 200, 255, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #64c8ff 0%, #a78bfa 100%);
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #8b92b0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+  background: linear-gradient(135deg, #64c8ff 0%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.content-section {
+  background: rgba(20, 27, 61, 0.4);
+  border: 1px solid rgba(100, 200, 255, 0.2);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 2rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+  color: #e4e6eb;
+}
+
+.post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.post-card {
+  background: rgba(10, 14, 39, 0.5);
+  border: 1px solid rgba(100, 200, 255, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.post-card:hover {
+  border-color: rgba(100, 200, 255, 0.4);
+  background: rgba(20, 27, 61, 0.6);
+  transform: translateX(4px);
+}
+
+.post-card.published {
+  opacity: 0.6;
+  border-color: rgba(100, 200, 100, 0.3);
+}
+
+.post-card.published::after {
+  content: '✓ PUBLISHED';
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 11px;
+  color: #5dcaa5;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+}
+
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.post-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.post-platforms {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.post-platform {
+  display: inline-block;
+  padding: 4px 10px;
+  background: rgba(167, 139, 250, 0.2);
+  color: #a78bfa;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.post-platform.linkedin {
+  background: rgba(100, 200, 255, 0.2);
+  color: #64c8ff;
+}
+
+.post-platform.facebook {
+  background: rgba(167, 139, 250, 0.2);
+  color: #a78bfa;
+}
+
+.post-datetime {
+  font-size: 12px;
+  color: #8b92b0;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.post-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: #8b92b0;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.icon-btn:hover {
+  background: rgba(100, 200, 255, 0.1);
+  color: #64c8ff;
+}
+
+.post-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #c4c8d4;
+  white-space: pre-wrap;
+  max-height: 150px;
+  overflow: hidden;
+  position: relative;
+}
+
+.post-content.expanded {
+  max-height: none;
+}
+
+.post-content::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(transparent, rgba(10, 14, 39, 0.5));
+  pointer-events: none;
+}
+
+.post-content.expanded::after {
+  display: none;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: #0a0e27;
+  border: 1px solid rgba(100, 200, 255, 0.3);
+  border-radius: 16px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(100, 200, 255, 0.2);
+}
+
+.modal-title {
+  font-size: 22px;
+  font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #8b92b0;
+  font-size: 28px;
+  cursor: pointer;
+  padding: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  background: rgba(100, 200, 255, 0.1);
+  color: #64c8ff;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  color: #8b92b0;
+  margin-bottom: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(20, 27, 61, 0.6);
+  border: 1px solid rgba(100, 200, 255, 0.2);
+  border-radius: 8px;
+  color: #e4e6eb;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: rgba(100, 200, 255, 0.5);
+  background: rgba(20, 27, 61, 0.8);
+}
+
+.form-textarea {
+  min-height: 200px;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+.platform-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(20, 27, 61, 0.6);
+  border: 1px solid rgba(100, 200, 255, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.checkbox-label:hover {
+  border-color: rgba(100, 200, 255, 0.4);
+  background: rgba(20, 27, 61, 0.8);
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.datetime-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #8b92b0;
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state-text {
+  font-size: 16px;
+  margin-bottom: 24px;
+}
+
+.alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.alert-info {
+  background: rgba(100, 200, 255, 0.1);
+  border: 1px solid rgba(100, 200, 255, 0.3);
+  color: #64c8ff;
+}
+
+.alert-warning {
+  background: rgba(255, 200, 100, 0.1);
+  border: 1px solid rgba(255, 200, 100, 0.3);
+  color: #ffb84d;
+}
+
+.char-counter {
+  text-align: right;
+  font-size: 12px;
+  color: #8b92b0;
+  margin-top: 4px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.char-counter.warning {
+  color: #ffb84d;
+}
+
+.char-counter.error {
+  color: #f09595;
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div>
+      <div class="logo">AUTOPILOT</div>
+      <div class="logo-sub">Social Media Command Center</div>
+    </div>
+    <div class="header-actions">
+      <button class="btn" onclick="refreshPosts()">🔄 Refresh</button>
+      <button class="btn-primary btn" onclick="openScheduleModal()">+ Schedule Post</button>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Queued</div>
+      <div class="stat-value" id="stat-queued">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Next 24h</div>
+      <div class="stat-value" id="stat-next24">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Published</div>
+      <div class="stat-value" id="stat-published">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total</div>
+      <div class="stat-value" id="stat-total">0</div>
+    </div>
+  </div>
+
+  <div class="content-section">
+    <div class="section-header">
+      <div class="section-title">Scheduled Posts</div>
+    </div>
+    <div id="post-list" class="post-list"></div>
+    <div id="empty-state" class="empty-state" style="display: none;">
+      <div class="empty-state-icon">🚀</div>
+      <div class="empty-state-text">No posts scheduled yet</div>
+      <button class="btn-primary btn" onclick="openScheduleModal()">Schedule Your First Post</button>
+    </div>
+  </div>
+</div>
+
+<!-- Schedule Modal -->
+<div id="schedule-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title">Schedule New Post</div>
+      <button class="close-btn" onclick="closeScheduleModal()">×</button>
+    </div>
+    
+    <div class="alert alert-info">
+      💡 Paste content from Claude here, select platforms, set time, and let Autopilot handle the rest
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">Post Content</div>
+      <textarea class="form-textarea" id="post-content" placeholder="Paste your content from Claude here..."></textarea>
+      <div class="char-counter" id="char-counter">0 characters</div>
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">Select Platforms</div>
+      <div class="platform-checkboxes">
+        <label class="checkbox-label">
+          <input type="checkbox" value="linkedin_personal" id="cb-linkedin-personal">
+          <span>LinkedIn Personal</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" value="linkedin_company" id="cb-linkedin-company">
+          <span>LinkedIn Company</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" value="facebook_personal" id="cb-facebook-personal">
+          <span>Facebook Personal</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" value="facebook_page" id="cb-facebook-page">
+          <span>Facebook Page</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">Schedule Date & Time</div>
+      <div class="datetime-group">
+        <input type="date" class="form-input" id="schedule-date">
+        <input type="time" class="form-input" id="schedule-time">
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 12px; justify-content: flex-end;">
+      <button class="btn" onclick="closeScheduleModal()">Cancel</button>
+      <button class="btn-primary btn" onclick="schedulePost()">🚀 Schedule</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="edit-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title">Edit Post</div>
+      <button class="close-btn" onclick="closeEditModal()">×</button>
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">Post Content</div>
+      <textarea class="form-textarea" id="edit-content"></textarea>
+      <div class="char-counter" id="edit-char-counter">0 characters</div>
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">Select Platforms</div>
+      <div class="platform-checkboxes">
+        <label class="checkbox-label">
+          <input type="checkbox" value="linkedin_personal" id="edit-cb-linkedin-personal">
+          <span>LinkedIn Personal</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" value="linkedin_company" id="edit-cb-linkedin-company">
+          <span>LinkedIn Company</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" value="facebook_personal" id="edit-cb-facebook-personal">
+          <span>Facebook Personal</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" value="facebook_page" id="edit-cb-facebook-page">
+          <span>Facebook Page</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">Schedule Date & Time</div>
+      <div class="datetime-group">
+        <input type="date" class="form-input" id="edit-date">
+        <input type="time" class="form-input" id="edit-time">
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 12px; justify-content: space-between;">
+      <button class="btn" onclick="deletePost()" style="border-color: rgba(239, 68, 68, 0.5); color: #ef4444;">Delete</button>
+      <div style="display: flex; gap: 12px;">
+        <button class="btn" onclick="closeEditModal()">Cancel</button>
+        <button class="btn-primary btn" onclick="saveEditedPost()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

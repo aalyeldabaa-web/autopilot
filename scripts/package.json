@@ -1,0 +1,16 @@
+{
+  "name": "autopilot-publisher",
+  "version": "1.0.0",
+  "description": "Automated social media publisher for Autopilot",
+  "main": "publish.js",
+  "scripts": {
+    "publish": "node publish.js",
+    "test": "node publish.js"
+  },
+  "keywords": ["automation", "social-media", "facebook", "linkedin"],
+  "author": "Ahmad Aly Eldabaa",
+  "license": "MIT",
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}
