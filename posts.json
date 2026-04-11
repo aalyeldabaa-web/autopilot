@@ -38,5 +38,15 @@
     "scheduledTime": "2026-04-11T23:40:00",
     "published": false,
     "createdAt": "2026-04-11T21:34:02.252Z"
+  },
+  {
+    "id": "1775943872470",
+    "content": "🧪 Testing Autopilot automation!\n   \n   If you're seeing this, my new social media automation system is working perfectly! \n   \n   Built with GitHub Actions + LinkedIn API. Zero monthly cost. 🚀\n   \n   #Automation #ProjectManagement #Tech",
+    "platforms": [
+      "linkedin_personal"
+    ],
+    "scheduledTime": "2026-04-11T23:50:00",
+    "published": false,
+    "createdAt": "2026-04-11T21:44:32.470Z"
   }
 ]
