@@ -17,7 +17,6 @@ async function init() {
   renderPosts();
   setupEventListeners();
   
-  // Set default datetime to now + 1 hour
   const now = new Date();
   now.setHours(now.getHours() + 1);
   const dateStr = now.toISOString().split('T')[0];
@@ -28,12 +27,9 @@ async function init() {
 }
 
 function setupEventListeners() {
-  // Character counters
   document.getElementById('post-content').addEventListener('input', updateCharCounter);
   document.getElementById('edit-content').addEventListener('input', updateEditCharCounter);
-  
-  // Auto-save drafts
-  setInterval(saveDraftsLocally, 30000); // Every 30 seconds
+  setInterval(saveDraftsLocally, 30000);
 }
 
 function updateCharCounter() {
@@ -61,7 +57,15 @@ function updateEditCharCounter() {
   counter.textContent = `${length.toLocaleString()} characters`;
 }
 
-// Load posts from GitHub
+// Base64 encoding/decoding (CSP-safe)
+function base64Encode(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+function base64Decode(str) {
+  return decodeURIComponent(escape(atob(str)));
+}
+
 async function loadPostsFromGitHub() {
   try {
     const token = localStorage.getItem('github_token');
@@ -81,7 +85,6 @@ async function loadPostsFromGitHub() {
     });
 
     if (response.status === 404) {
-      // File doesn't exist yet - create it
       await createPostsFile(token);
       posts = [];
       return;
@@ -92,13 +95,10 @@ async function loadPostsFromGitHub() {
     }
 
     const data = await response.json();
-    const content = atob(data.content);
+    const content = base64Decode(data.content.replace(/\n/g, ''));
     posts = JSON.parse(content);
     
-    // Save SHA for future updates
     localStorage.setItem('posts_sha', data.sha);
-    
-    // Also save locally as backup
     saveDraftsLocally();
     
   } catch (error) {
@@ -111,7 +111,7 @@ async function createPostsFile(token) {
   const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.postsFile}`;
   
   const initialData = JSON.stringify([], null, 2);
-  const content = btoa(initialData);
+  const content = base64Encode(initialData);
   
   const response = await fetch(url, {
     method: 'PUT',
@@ -148,7 +148,6 @@ function saveDraftsLocally() {
   localStorage.setItem('autopilot_posts', JSON.stringify(posts));
 }
 
-// Save posts to GitHub
 async function savePostsToGitHub() {
   try {
     const token = localStorage.getItem('github_token');
@@ -161,7 +160,7 @@ async function savePostsToGitHub() {
     const sha = localStorage.getItem('posts_sha');
     const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.postsFile}`;
     
-    const content = btoa(JSON.stringify(posts, null, 2));
+    const content = base64Encode(JSON.stringify(posts, null, 2));
     
     const response = await fetch(url, {
       method: 'PUT',
@@ -184,8 +183,6 @@ async function savePostsToGitHub() {
 
     const data = await response.json();
     localStorage.setItem('posts_sha', data.content.sha);
-    
-    // Also save locally
     saveDraftsLocally();
     
     return true;
@@ -196,7 +193,6 @@ async function savePostsToGitHub() {
   }
 }
 
-// UI Functions
 function updateStats() {
   const now = new Date();
   
@@ -230,13 +226,9 @@ function renderPosts() {
   container.style.display = 'flex';
   emptyState.style.display = 'none';
   
-  // Sort by scheduled time (upcoming first)
   const sortedPosts = [...posts].sort((a, b) => {
-    // Published posts go to bottom
     if (a.published && !b.published) return 1;
     if (!a.published && b.published) return -1;
-    
-    // Sort by scheduled time
     return new Date(a.scheduledTime) - new Date(b.scheduledTime);
   });
   
@@ -287,7 +279,6 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// Modal Functions
 function openScheduleModal() {
   document.getElementById('schedule-modal').classList.add('active');
   document.getElementById('post-content').focus();
@@ -353,19 +344,17 @@ async function schedulePost() {
 }
 
 function editPost(id) {
-  const post = posts.find(p => p.id === id);
+  const post = posts.find(p => p.id == id);
   if (!post) return;
   
   currentEditId = id;
   
   document.getElementById('edit-content').value = post.content;
   
-  // Parse scheduled time
   const dt = new Date(post.scheduledTime);
   document.getElementById('edit-date').value = dt.toISOString().split('T')[0];
   document.getElementById('edit-time').value = dt.toTimeString().slice(0, 5);
   
-  // Set platforms
   document.querySelectorAll('#edit-modal input[type="checkbox"]').forEach(cb => {
     cb.checked = post.platforms.includes(cb.value);
   });
@@ -382,7 +371,7 @@ function closeEditModal() {
 async function saveEditedPost() {
   if (!currentEditId) return;
   
-  const post = posts.find(p => p.id === currentEditId);
+  const post = posts.find(p => p.id == currentEditId);
   if (!post) return;
   
   post.content = document.getElementById('edit-content').value.trim();
@@ -438,7 +427,6 @@ async function refreshPosts() {
   alert('✅ Posts refreshed from GitHub');
 }
 
-// Setup GitHub Token
 function setupGitHubToken() {
   const token = prompt('Enter your GitHub Personal Access Token:\n\nThis will be stored locally and used to sync posts to your repository.');
   if (token) {
@@ -448,7 +436,6 @@ function setupGitHubToken() {
   }
 }
 
-// Check if token exists on load
 window.addEventListener('DOMContentLoaded', () => {
   const token = localStorage.getItem('github_token');
   if (!token) {
