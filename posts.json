@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "id": "1775945471544",
+    "content": "Test my new Automation tool",
+    "platforms": [
+      "linkedin_personal"
+    ],
+    "scheduledTime": "2026-04-11T22:50:00.000Z",
+    "published": false,
+    "createdAt": "2026-04-11T22:11:11.544Z"
+  }
+]
