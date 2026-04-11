@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "id": "1775942504314",
+    "content": "Testing my new Autopilot system! \n   \n   If you see this, automation is working! 🚀\n   \n   #Automation #LinkedIn",
+    "platforms": [
+      "linkedin_personal"
+    ],
+    "scheduledTime": "2026-04-11T23:26:00",
+    "published": false,
+    "createdAt": "2026-04-11T21:21:44.314Z"
+  }
+]
