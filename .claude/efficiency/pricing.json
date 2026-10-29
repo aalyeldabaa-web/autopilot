@@ -1,0 +1,21 @@
+{
+  "_note": "USD per 1M tokens, keyed by a substring of the model id (longest match wins). null means unknown and the model reports as unpriced; a zero is also treated as unknown. Estimates only; never the subscription bill. Installer fills from the official pricing page.",
+  "haiku": {
+    "input": null,
+    "output": null,
+    "cache_read": null,
+    "cache_write": null
+  },
+  "sonnet": {
+    "input": null,
+    "output": null,
+    "cache_read": null,
+    "cache_write": null
+  },
+  "opus": {
+    "input": null,
+    "output": null,
+    "cache_read": null,
+    "cache_write": null
+  }
+}

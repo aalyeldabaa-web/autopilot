@@ -1,0 +1,11 @@
+{
+  "version": "2.1.2",
+  "max_parallel_agents": 2,
+  "max_repair_attempts": 2,
+  "direct_file_threshold": 3,
+  "paid_models_allowed": false,
+  "telemetry": true,
+  "retain_task_records": 2000,
+  "estimate_min_samples": 5,
+  "overhead_budget_ms": 800
+}

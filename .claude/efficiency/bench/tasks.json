@@ -1,0 +1,33 @@
+{
+  "_note": "Installer replaces these with three real tasks from the repo. acceptance must exit 0 only when the task is correctly done; setup may introduce a failure to fix.",
+  "small": {
+    "prompt": "<one-function change naming the file>",
+    "setup": "",
+    "acceptance": "<command exiting 0 on success>",
+    "allowed_tools": [
+      "Bash(npm test*)"
+    ],
+    "max_turns": 25,
+    "timeout_s": 900
+  },
+  "medium": {
+    "prompt": "<multi-file feature with explicit acceptance criteria>",
+    "setup": "",
+    "acceptance": "<command>",
+    "allowed_tools": [
+      "Bash(npm test*)"
+    ],
+    "max_turns": 60,
+    "timeout_s": 1800
+  },
+  "complex": {
+    "prompt": "<debugging or architectural task with a reproducible failing test>",
+    "setup": "<command that introduces the failure>",
+    "acceptance": "<command>",
+    "allowed_tools": [
+      "Bash(npm test*)"
+    ],
+    "max_turns": 90,
+    "timeout_s": 3600
+  }
+}

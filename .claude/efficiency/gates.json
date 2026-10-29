@@ -1,0 +1,32 @@
+{
+  "_note": "Installer fills commands from the repo profile. required = gates per class; review:<agent> needs a review record from that agent, backed by a hook-recorded execution. flag_requires adds gates when the classifier set a flag. All gates must be at the current code revision.",
+  "commands": {},
+  "required": {
+    "T": [],
+    "S": [
+      "test",
+      "lint"
+    ],
+    "M": [
+      "test",
+      "lint",
+      "review:reviewer"
+    ],
+    "L": [
+      "test",
+      "lint",
+      "review:reviewer-deep"
+    ],
+    "X": [
+      "test",
+      "lint",
+      "review:reviewer-deep"
+    ]
+  },
+  "flag_requires": {
+    "security": [
+      "review:reviewer-deep"
+    ]
+  },
+  "require_review_execution_record": true
+}
