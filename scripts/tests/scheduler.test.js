@@ -49,3 +49,20 @@ test('keeps unknown platforms pending instead of silently claiming success', () 
   assert.deepEqual(platformsRemaining(post), ['unknown_platform']);
   assert.equal(post.published, false);
 });
+
+test('ambiguous provider failure stays held until a human reconciles the remote platform', () => {
+  const post = sample('2026-11-04T19:30:00Z');
+  recordResult(post, { platform: 'linkedin_personal', success: true, id: 'confirmed' });
+  recordResult(post, { platform: 'facebook_page', success: false, needsManualReview: true, error: 'Timeout after request' });
+  assert.equal(post.published, false);
+  assert.deepEqual(platformsRemaining(post), []);
+  assert.equal(post.publishResults.find(x => x.platform === 'facebook_page').needsManualReview, true);
+});
+test('legacy published flag with failed platform receipt is held, never reported complete', () => {
+  const post = sample('2026-04-11T22:50:00Z', {
+    published: true,
+    publishResults: [{ platform: 'linkedin_personal', success: true, id: 'a' },
+                     { platform: 'facebook_page', success: false, error: 'failed' }]
+  });
+  assert.equal(classifyPost(post, now), 'legacy_partial_review');
+});
