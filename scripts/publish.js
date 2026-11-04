@@ -48,7 +48,7 @@ async function main() {
     for (const platform of platformsRemaining(post)) {
       const publish = publishers[platform];
       if (!publish) {
-        recordResult(post, { platform, success: false, error: 'UNSUPPORTED_PLATFORM' });
+        recordResult(post, { platform, success: false, needsManualReview: true, error: 'UNSUPPORTED_PLATFORM' });
         console.error('Unknown publishing target:', platform);
         await writeState(posts);
         continue;
@@ -59,7 +59,7 @@ async function main() {
         recordResult(post, { platform, success: true, id: result.id });
         console.log('Confirmed platform:', platform, 'remote ID:', result.id);
       } catch (err) {
-        recordResult(post, { platform, success: false, error: err?.message || String(err) });
+        recordResult(post, { platform, success: false, needsManualReview: true, error: err?.message || String(err) });
         console.error('Failed:', platform, err?.message || err);
       }
       // Preserve partial successful platforms locally after every provider call;
