@@ -68,7 +68,7 @@ function base64Decode(str) {
 
 async function loadPostsFromGitHub() {
   try {
-    const token = localStorage.getItem('github_token');
+    const token = sessionStorage.getItem('github_token');
     if (!token) {
       console.warn('No GitHub token found - using local storage only');
       loadPostsLocally();
@@ -150,7 +150,7 @@ function saveDraftsLocally() {
 
 async function savePostsToGitHub() {
   try {
-    const token = localStorage.getItem('github_token');
+    const token = sessionStorage.getItem('github_token');
     if (!token) {
       console.warn('No GitHub token - saving locally only');
       saveDraftsLocally();
@@ -447,16 +447,18 @@ async function refreshPosts() {
 }
 
 function setupGitHubToken() {
-  const token = prompt('Enter your GitHub Personal Access Token:\n\nThis will be stored locally and used to sync posts to your repository.');
+  const token = prompt('Enter your GitHub Personal Access Token:\n\nThis token stays in this browser tab only and is never persisted. Use a fine-grained GitHub token scoped to the Autopilot repository, and revoke after use.');
   if (token) {
-    localStorage.setItem('github_token', token);
-    alert('✅ GitHub token saved! Autopilot will now sync with your repository.');
+    sessionStorage.setItem('github_token', token);
+    alert('✅ GitHub token active for this browser tab only. Avoid shared computers.');
     init();
   }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  const token = localStorage.getItem('github_token');
+  // Erase tokens persisted by previous versions. Never migrate secrets silently.
+  localStorage.removeItem('github_token');
+  const token = sessionStorage.getItem('github_token');
   if (!token) {
     const setup = confirm('Autopilot needs a GitHub token to sync posts.\n\nDo you want to set it up now?');
     if (setup) {

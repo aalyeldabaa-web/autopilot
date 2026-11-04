@@ -2,46 +2,56 @@ name: Autopilot - Social Media Publisher
 
 on:
   schedule:
-    # Runs every hour at :00
     - cron: '0 * * * *'
-  
-  # Allow manual trigger
   workflow_dispatch:
+
+# Needs write only to commit post results; no other permissions.
+permissions:
+  contents: write
+
+# Never run two potentially publishing jobs at once.
+concurrency:
+  group: autopilot-publisher
+  cancel-in-progress: false
 
 jobs:
   publish-posts:
     runs-on: ubuntu-latest
-    
+    timeout-minutes: 15
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-      
+        uses: actions/checkout@v4
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
-      
+          node-version: '22'
       - name: Install dependencies
-        run: |
-          cd scripts
-          npm install
-      
-      - name: Check and publish scheduled posts
+        working-directory: scripts
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Publish due posts (no early/stale items)
+        id: publish
+        continue-on-error: true
+        working-directory: scripts
         env:
           FACEBOOK_PAGE_ACCESS_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
           FACEBOOK_USER_ACCESS_TOKEN: ${{ secrets.FACEBOOK_USER_ACCESS_TOKEN }}
           LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
           LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
           LINKEDIN_ORGANIZATION_URN: ${{ secrets.LINKEDIN_ORGANIZATION_URN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          cd scripts
-          node publish.js
-      
-      - name: Commit updated posts file
+          FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
+        run: node publish.js
+      - name: Persist individual platform results even if a platform failed
+        if: always()
         run: |
           git config --local user.email "autopilot@ajaxsolutions.net"
           git config --local user.name "Autopilot Bot"
           git add posts.json
-          git diff --staged --quiet || git commit -m "🤖 Autopilot: Published scheduled posts"
-          git push
+          if ! git diff --staged --quiet; then
+            git commit -m "Autopilot: persist platform publishing receipts"
+            git push
+          fi
+      - name: Preserve failed publish status after saving receipts
+        if: steps.publish.outcome == 'failure'
+        run: |
+          echo "Partial publish or invalid queued item. Inspect saved platform results."
+          exit 1
