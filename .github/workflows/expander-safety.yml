@@ -1,0 +1,24 @@
+name: Expander Safety Tests
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  no-live-publishing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check publisher syntax
+        run: node --check scripts/publish.js
+      - name: Check pure scheduler syntax
+        run: node --check scripts/scheduler.js
+      - name: Run pure, no-network scheduler tests
+        run: node --test scripts/tests/scheduler.test.js
