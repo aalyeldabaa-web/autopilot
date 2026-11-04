@@ -5,9 +5,14 @@
   "main": "publish.js",
   "scripts": {
     "publish": "node publish.js",
-    "test": "node publish.js"
+    "test": "node --test tests/*.test.js"
   },
-  "keywords": ["automation", "social-media", "facebook", "linkedin"],
+  "keywords": [
+    "automation",
+    "social-media",
+    "facebook",
+    "linkedin"
+  ],
   "author": "Ahmad Aly Eldabaa",
   "license": "MIT",
   "dependencies": {
