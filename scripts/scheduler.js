@@ -4,7 +4,13 @@
 const MAX_LATE_MS = 2 * 60 * 60 * 1000;
 
 function classifyPost(post, now = new Date(), maxLateMs = MAX_LATE_MS) {
-  if (!post || post.published === true) return 'complete';
+  if (!post) return 'invalid';
+  if (post.published === true) {
+    const targets = Array.isArray(post.platforms) ? post.platforms : [];
+    const confirmed = successfulPlatforms(post);
+    return Array.isArray(post.publishResults) && targets.some(p => !confirmed.has(p))
+      ? 'legacy_partial_review' : 'complete';
+  }
   if (!Array.isArray(post.platforms) || post.platforms.length === 0) return 'invalid';
   if (typeof post.scheduledTime !== 'string') return 'invalid';
   const timestamp = Date.parse(post.scheduledTime);
@@ -25,7 +31,10 @@ function successfulPlatforms(post) {
 
 function platformsRemaining(post) {
   const done = successfulPlatforms(post);
-  return Array.isArray(post?.platforms) ? [...new Set(post.platforms)].filter(p => !done.has(p)) : [];
+  const held = new Set((Array.isArray(post?.publishResults) ? post.publishResults : [])
+    .filter(x => x && x.needsManualReview === true).map(x => x.platform));
+  return Array.isArray(post?.platforms)
+    ? [...new Set(post.platforms)].filter(p => !done.has(p) && !held.has(p)) : [];
 }
 
 function recordResult(post, result) {
