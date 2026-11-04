@@ -33,14 +33,17 @@ async function main() {
   const due = [];
   const stale = [];
   const invalid = [];
+  const legacyPartial = [];
   for (const post of posts) {
     const status = classifyPost(post, now);
     if (status === 'due') due.push(post);
     if (status === 'stale') stale.push(post.id);
     if (status === 'invalid') invalid.push(post.id);
+    if (status === 'legacy_partial_review') legacyPartial.push(post.id);
   }
   if (stale.length) console.warn('HOLD: stale unsent posts need manual review:', stale);
   if (invalid.length) console.error('HOLD: invalid schedule/target:', invalid);
+  if (legacyPartial.length) console.error('HOLD: legacy partial-published records need reconciliation:', legacyPartial);
   console.log('Due posts:', due.length, 'stale:', stale.length, 'invalid:', invalid.length);
 
   for (const post of due) {
@@ -71,7 +74,7 @@ async function main() {
 
   const incomplete = due.filter(post => !post.published).length;
   console.log('Finished; incomplete due posts:', incomplete, 'stale held:', stale.length);
-  if (incomplete || invalid.length) process.exitCode = 1;
+  if (incomplete || invalid.length || legacyPartial.length) process.exitCode = 1;
 }
 
 if (require.main === module) {
